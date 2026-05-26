@@ -340,6 +340,78 @@ footer{
 }
 .toast.show{transform:translateX(-50%) translateY(0);}
 
+/* ── PRODUCT VIEW PAGE ── */
+.product-view-overlay{
+  display:none;position:fixed;inset:0;z-index:1000;
+  background:#0a0a0fee;backdrop-filter:blur(16px);
+  overflow-y:auto;
+  animation:fadeIn 0.2s ease;
+}
+.product-view-overlay.active{display:block;}
+.product-view-inner{
+  min-height:100vh;display:flex;align-items:flex-start;justify-content:center;
+  padding:24px 16px 60px;
+}
+.product-view-card{
+  background:var(--card);border-radius:24px;border:1px solid #ffffff11;
+  max-width:480px;width:100%;margin-top:20px;overflow:hidden;
+  animation:slideUp 0.3s cubic-bezier(0.34,1.56,0.64,1);
+  box-shadow:0 30px 80px #00000088;
+}
+.pv-back-btn{
+  display:flex;align-items:center;gap:8px;
+  padding:16px 20px;background:none;border:none;
+  color:var(--muted);font-family:'DM Sans',sans-serif;font-size:14px;font-weight:600;
+  cursor:pointer;transition:color 0.2s;width:100%;
+  border-bottom:1px solid var(--border);
+}
+.pv-back-btn:hover{color:var(--text);}
+.pv-back-btn svg{width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:2.5;stroke-linecap:round;stroke-linejoin:round;}
+.pv-img{width:100%;max-height:280px;object-fit:cover;display:block;}
+.pv-img-placeholder{
+  width:100%;height:220px;
+  background:linear-gradient(135deg,#1e1e2a,#ff5f4022);
+  display:flex;align-items:center;justify-content:center;font-size:72px;
+}
+.pv-body{padding:24px 24px 28px;}
+.pv-category{
+  font-size:11px;font-weight:700;color:var(--orange);letter-spacing:1.5px;
+  text-transform:uppercase;margin-bottom:10px;
+}
+.pv-title{
+  font-family:'Syne',sans-serif;font-size:26px;font-weight:800;
+  line-height:1.2;margin-bottom:14px;color:var(--text);
+}
+.pv-desc{
+  font-size:15px;color:var(--muted);line-height:1.75;
+  margin-bottom:28px;padding-bottom:24px;
+  border-bottom:1px solid var(--border);
+}
+.pv-price-row{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;}
+.pv-price-label{font-size:12px;color:var(--muted);font-weight:600;text-transform:uppercase;letter-spacing:1px;}
+.pv-price{
+  font-family:'Syne',sans-serif;font-size:36px;font-weight:800;
+  background:var(--grad);-webkit-background-clip:text;-webkit-text-fill-color:transparent;
+}
+.btn-get-now{
+  width:100%;padding:17px;
+  background:linear-gradient(135deg,#25d366,#128c7e);
+  border:none;border-radius:16px;
+  color:white;font-family:'DM Sans',sans-serif;font-weight:800;font-size:17px;
+  cursor:pointer;transition:all 0.2s;
+  display:flex;align-items:center;justify-content:center;gap:10px;
+  box-shadow:0 6px 24px #25d36655;
+  letter-spacing:0.3px;
+}
+.btn-get-now:hover{transform:translateY(-2px);box-shadow:0 10px 32px #25d36677;}
+.btn-get-now:active{transform:scale(0.98);}
+.btn-get-now svg{width:22px;height:22px;fill:white;flex-shrink:0;}
+.pv-note{
+  text-align:center;font-size:12px;color:var(--muted);margin-top:12px;
+}
+
+@keyframes fadeIn{from{opacity:0;}to{opacity:1;}}
+@keyframes slideUp{from{opacity:0;transform:translateY(40px);}to{opacity:1;transform:translateY(0);}}
 @keyframes fadeUp{from{opacity:0;transform:translateY(24px);}to{opacity:1;transform:translateY(0);}}
 
 @media(max-width:900px){
@@ -373,6 +445,8 @@ footer{
   .about-text h2{font-size:26px;}
   .policy-wrapper { padding: 90px 16px 60px; }
   .glass-card { padding: 24px; }
+  .pv-title{font-size:22px;}
+  .pv-price{font-size:30px;}
 }
 </style>
 </head>
@@ -394,6 +468,33 @@ footer{
   <a onclick="goHomeAndScroll('categories');toggleMenu()">Categories</a>
   <a onclick="goHomeAndScroll('about');toggleMenu()">About</a>
   <a onclick="goHomeAndScroll('contact');toggleMenu()">Contact</a>
+</div>
+
+<!-- ══ PRODUCT VIEW OVERLAY ══ -->
+<div class="product-view-overlay" id="product-view-overlay">
+  <div class="product-view-inner">
+    <div class="product-view-card">
+      <button class="pv-back-btn" onclick="closeProductPage()">
+        <svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>
+        Back to Shop
+      </button>
+      <div id="pv-img-wrap"></div>
+      <div class="pv-body">
+        <div class="pv-category" id="pv-category"></div>
+        <div class="pv-title" id="pv-title"></div>
+        <div class="pv-desc" id="pv-desc"></div>
+        <div class="pv-price-row">
+          <div class="pv-price-label">Price</div>
+          <div class="pv-price" id="pv-price"></div>
+        </div>
+        <button class="btn-get-now" id="pv-get-btn">
+          <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M11.999 0C5.372 0 0 5.373 0 12.001c0 2.117.554 4.103 1.522 5.833L.057 23.885a.5.5 0 0 0 .609.61l6.098-1.597A11.945 11.945 0 0 0 12 24c6.627 0 12-5.373 12-12S18.626 0 11.999 0zm0 21.818a9.818 9.818 0 0 1-5.011-1.37l-.36-.213-3.724.976.993-3.63-.234-.374A9.818 9.818 0 0 1 2.182 12c0-5.42 4.398-9.818 9.818-9.818S21.818 6.58 21.818 12s-4.399 9.818-9.819 9.818z"/></svg>
+          Get Now on WhatsApp
+        </button>
+        <div class="pv-note">📩 Send payment screenshot to receive your files instantly</div>
+      </div>
+    </div>
+  </div>
 </div>
 
 <div class="page active" id="page-website">
@@ -454,7 +555,7 @@ footer{
     <div class="section-inner">
       <div class="section-label">All Products</div>
       <h2 class="section-title">Shop Reels Bundles</h2>
-      <p class="section-sub">Click 'Buy Now' to instantly order via WhatsApp.</p>
+      <p class="section-sub">Click on any product to view details and order via WhatsApp.</p>
       <div class="products-grid" id="public-products">
         <div style="grid-column:1/-1;text-align:center;padding:60px 20px;color:var(--muted);">
           <div style="font-size:48px;margin-bottom:16px;">⏳</div>
@@ -692,7 +793,7 @@ footer{
       <div style="margin-top:24px;">
         <div class="faq-box">
           <h3>📦 How to Download Products?</h3>
-          <p>After clicking "Buy Now", you will be redirected to WhatsApp. Once you complete the payment and send us the screenshot, we will instantly reply with your secure Google Drive/Download link.</p>
+          <p>After clicking "Get Now", you will be redirected to WhatsApp. Once you complete the payment and send us the screenshot, we will instantly reply with your secure Google Drive/Download link.</p>
         </div>
         <div class="faq-box">
           <h3>⚡ Instant Delivery Information</h3>
@@ -825,13 +926,53 @@ function toggleMenu(){
 }
 
 // ════════════════════════════════════
-// RENDER PUBLIC PRODUCTS
+// PRODUCT VIEW PAGE (OVERLAY)
 // ════════════════════════════════════
 const catLabels = {reels:'🎬 Reels Bundle', trending:'✨ Trending Pack', niche:'🎭 Niche Bundle', premium:'💎 Premium Pack'};
 
+function openProductPage(i) {
+  const p = products[i];
+  const overlay = document.getElementById('product-view-overlay');
+
+  // Image
+  const imgWrap = document.getElementById('pv-img-wrap');
+  if (p.img) {
+    imgWrap.innerHTML = `<img class="pv-img" src="${p.img}" alt="${p.title}">`;
+  } else {
+    imgWrap.innerHTML = `<div class="pv-img-placeholder">🎬</div>`;
+  }
+
+  // Details
+  document.getElementById('pv-category').textContent = catLabels[p.cat] || '🎬 Reels Bundle';
+  document.getElementById('pv-title').textContent = p.title;
+  document.getElementById('pv-desc').textContent = p.desc;
+  document.getElementById('pv-price').textContent = '₹' + Number(p.price).toLocaleString('en-IN');
+
+  // WhatsApp button
+  document.getElementById('pv-get-btn').onclick = function() {
+    openWhatsAppPayment(i);
+  };
+
+  overlay.classList.add('active');
+  document.body.style.overflow = 'hidden';
+}
+
+function closeProductPage() {
+  document.getElementById('product-view-overlay').classList.remove('active');
+  document.body.style.overflow = '';
+}
+
+// Close on backdrop click
+document.getElementById('product-view-overlay').addEventListener('click', function(e) {
+  if (e.target === this) closeProductPage();
+});
+
+// ════════════════════════════════════
+// RENDER PUBLIC PRODUCTS
+// ════════════════════════════════════
 function publicProductCardHTML(p, i){
   return `
-    <div class="product-card" onclick="openWhatsAppPayment(${i})">
+    <div class="product-card" onclick="openProductPage(${i})">
       ${p.img
         ? `<img class="p-img" src="${p.img}" alt="${p.title}">`
         : `<div class="p-img-placeholder">🎬</div>`}
@@ -841,7 +982,7 @@ function publicProductCardHTML(p, i){
         <div class="p-desc">${p.desc}</div>
         <div class="p-footer">
           <div class="p-price">₹${Number(p.price).toLocaleString('en-IN')}</div>
-          <button class="btn-buy" onclick="event.stopPropagation();openWhatsAppPayment(${i})">Buy Now ⚡</button>
+          <button class="btn-buy" onclick="event.stopPropagation();openProductPage(${i})">View Details →</button>
         </div>
       </div>
     </div>`;
@@ -905,3 +1046,4 @@ loadProducts();
 </script>
 </body>
 </html>
+
