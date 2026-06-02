@@ -137,7 +137,8 @@ section{padding:80px 24px;}
 .section-sub{font-size:15px;color:var(--muted);max-width:500px;line-height:1.7;}
 
 .products-grid{
-  display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));
+  display:grid;
+  grid-template-columns:repeat(2, 1fr);
   gap:22px;margin-top:44px;
 }
 .product-card{
@@ -145,11 +146,15 @@ section{padding:80px 24px;}
   border:1px solid var(--border);transition:all 0.3s;cursor:pointer;
 }
 .product-card:hover{transform:translateY(-6px);border-color:#ff5f4033;box-shadow:0 20px 50px #00000060;}
+
 .product-card .p-img{
-  width:100%;height:200px;object-fit:cover;display:block;
+  width:100%;
+  aspect-ratio: 1 / 1;
+  object-fit:cover;display:block;
 }
 .product-card .p-img-placeholder{
-  width:100%;height:200px;
+  width:100%;
+  aspect-ratio: 1 / 1;
   background:linear-gradient(135deg,#1e1e2a,#ff5f4022);
   display:flex;align-items:center;justify-content:center;font-size:56px;
 }
@@ -158,9 +163,14 @@ section{padding:80px 24px;}
   font-size:11px;font-weight:700;color:var(--orange);letter-spacing:1px;
   text-transform:uppercase;margin-bottom:8px;
 }
-.product-card .p-title{font-family:'Syne',sans-serif;font-size:18px;font-weight:700;margin-bottom:8px;line-height:1.3;}
-.product-card .p-desc{font-size:13px;color:var(--muted);line-height:1.6;margin-bottom:16px;}
-.product-card .p-footer{display:flex;align-items:center;justify-content:space-between;}
+.product-card .p-title{font-family:'Syne',sans-serif;font-size:18px;font-weight:700;margin-bottom:16px;line-height:1.3;}
+
+/* Main card par description hide rakhi hai */
+.product-card .p-desc{
+  display: none;
+}
+
+.product-card .p-footer{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;}
 .product-card .p-price{
   font-family:'Syne',sans-serif;font-size:22px;font-weight:800;
   background:var(--grad);-webkit-background-clip:text;-webkit-text-fill-color:transparent;
@@ -340,7 +350,6 @@ footer{
 }
 .toast.show{transform:translateX(-50%) translateY(0);}
 
-/* ── PRODUCT VIEW PAGE ── */
 .product-view-overlay{
   display:none;position:fixed;inset:0;z-index:1000;
   background:#0a0a0fee;backdrop-filter:blur(16px);
@@ -367,9 +376,15 @@ footer{
 }
 .pv-back-btn:hover{color:var(--text);}
 .pv-back-btn svg{width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:2.5;stroke-linecap:round;stroke-linejoin:round;}
-.pv-img{width:100%;max-height:280px;object-fit:cover;display:block;}
+
+.pv-img{
+  width:100%;
+  aspect-ratio: 1 / 1;
+  object-fit:cover;display:block;
+}
 .pv-img-placeholder{
-  width:100%;height:220px;
+  width:100%;
+  aspect-ratio: 1 / 1;
   background:linear-gradient(135deg,#1e1e2a,#ff5f4022);
   display:flex;align-items:center;justify-content:center;font-size:72px;
 }
@@ -434,7 +449,10 @@ footer{
   .hero-stat .lbl{font-size:11px;}
   section{padding:50px 16px;}
   .section-title{font-size:26px;}
-  .products-grid{grid-template-columns:1fr;}
+  
+  /* Mobile ke liye wapas 2 column kar diya gaya hai */
+  .products-grid{grid-template-columns: repeat(2, 1fr); gap: 12px;}
+  
   .categories-grid{grid-template-columns:1fr 1fr;}
   .features-grid{grid-template-columns:1fr;}
   .testimonials-grid{grid-template-columns:1fr;}
@@ -470,7 +488,6 @@ footer{
   <a onclick="goHomeAndScroll('contact');toggleMenu()">Contact</a>
 </div>
 
-<!-- ══ PRODUCT VIEW OVERLAY ══ -->
 <div class="product-view-overlay" id="product-view-overlay">
   <div class="product-view-inner">
     <div class="product-view-card">
@@ -856,9 +873,6 @@ footer{
 <div class="toast" id="toast"></div>
 
 <script>
-// ════════════════════════════════════
-// SUPABASE CONFIG
-// ════════════════════════════════════
 const SUPABASE_URL = 'https://ukoxrbvtbfravlbjasnt.supabase.co';
 const SUPABASE_KEY = 'sb_publishable_44LFF26HauRZwsWVBiaA_w_nfkzdQCr';
 
@@ -881,9 +895,6 @@ async function supabaseFetch(path, options = {}) {
 
 let products = [];
 
-// ════════════════════════════════════
-// LOAD PRODUCTS FROM SUPABASE
-// ════════════════════════════════════
 async function loadProducts() {
   try {
     const data = await supabaseFetch('/rest/v1/products?select=*&order=created_at.desc');
@@ -896,9 +907,6 @@ async function loadProducts() {
   }
 }
 
-// ════════════════════════════════════
-// PAGE NAV & ROUTING
-// ════════════════════════════════════
 function showPublicPage(pageId) {
   document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
   document.getElementById(pageId).classList.add('active');
@@ -925,16 +933,12 @@ function toggleMenu(){
   document.getElementById('mobile-menu').classList.toggle('open');
 }
 
-// ════════════════════════════════════
-// PRODUCT VIEW PAGE (OVERLAY)
-// ════════════════════════════════════
 const catLabels = {reels:'🎬 Reels Bundle', trending:'✨ Trending Pack', niche:'🎭 Niche Bundle', premium:'💎 Premium Pack'};
 
 function openProductPage(i) {
   const p = products[i];
   const overlay = document.getElementById('product-view-overlay');
 
-  // Image
   const imgWrap = document.getElementById('pv-img-wrap');
   if (p.img) {
     imgWrap.innerHTML = `<img class="pv-img" src="${p.img}" alt="${p.title}">`;
@@ -942,13 +946,11 @@ function openProductPage(i) {
     imgWrap.innerHTML = `<div class="pv-img-placeholder">🎬</div>`;
   }
 
-  // Details
   document.getElementById('pv-category').textContent = catLabels[p.cat] || '🎬 Reels Bundle';
   document.getElementById('pv-title').textContent = p.title;
   document.getElementById('pv-desc').textContent = p.desc;
   document.getElementById('pv-price').textContent = '₹' + Number(p.price).toLocaleString('en-IN');
 
-  // WhatsApp button
   document.getElementById('pv-get-btn').onclick = function() {
     openWhatsAppPayment(i);
   };
@@ -962,14 +964,10 @@ function closeProductPage() {
   document.body.style.overflow = '';
 }
 
-// Close on backdrop click
 document.getElementById('product-view-overlay').addEventListener('click', function(e) {
   if (e.target === this) closeProductPage();
 });
 
-// ════════════════════════════════════
-// RENDER PUBLIC PRODUCTS
-// ════════════════════════════════════
 function publicProductCardHTML(p, i){
   return `
     <div class="product-card" onclick="openProductPage(${i})">
@@ -997,7 +995,6 @@ function renderAll(){
     pub.innerHTML = products.map((p,i)=>publicProductCardHTML(p,i)).join('');
   }
 
-  // Category counts
   const cats = {reels:0,trending:0,niche:0,premium:0};
   products.forEach(p=>{ if(cats[p.cat]!==undefined) cats[p.cat]++; });
   document.getElementById('cat-count-reels').textContent = cats.reels+' products';
@@ -1006,9 +1003,6 @@ function renderAll(){
   document.getElementById('cat-count-premium').textContent = cats.premium+' products';
 }
 
-// ════════════════════════════════════
-// WHATSAPP PAYMENT INTEGRATION
-// ════════════════════════════════════
 function openWhatsAppPayment(i){
   const p = products[i];
   const phoneNumber = '919107388902';
@@ -1018,9 +1012,6 @@ function openWhatsAppPayment(i){
   window.open(whatsappUrl, '_blank');
 }
 
-// ════════════════════════════════════
-// CONTACT
-// ════════════════════════════════════
 function submitContact(){
   const n=document.getElementById('c-name').value.trim();
   const e=document.getElementById('c-email').value.trim();
@@ -1032,16 +1023,12 @@ function submitContact(){
   showToast('📨 Message sent! We\'ll reply soon.');
 }
 
-// ════════════════════════════════════
-// TOAST
-// ════════════════════════════════════
 function showToast(msg){
   const t=document.getElementById('toast');
   t.textContent=msg; t.classList.add('show');
   setTimeout(()=>t.classList.remove('show'),2800);
 }
 
-// init
 loadProducts();
 </script>
 </body>
